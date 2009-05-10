@@ -15,6 +15,7 @@ options = RubyFlashbakeOptions.new(ARGV)
 rfb = RubyFlashbake.new
 rfb.load_file(options.config_file)
 rfb.check_git_setup(Dir.pwd)
+rfb.check_github_setup(Dir.pwd)
 rfb.load_plugins
 rfb.setup_watch_commits(Dir.pwd, true)
 rfb.start_directory_watchers
