@@ -187,8 +187,8 @@ describe RubyFlashbake do
     rfb.configuration[:GIT][:NAME] = "Test Monkey"
     rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
     rfb.configuration[:GIT][:USE_GITHUB] = true
-    rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "coryondrejka"
-    rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "test"
+    rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "fake"
+    rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
     rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
     rfb.configuration[:DIRECTORY_MONITOR_INTERVAL] = 1
     rfb.configuration[:STABLE_INTERVALS] = 1
