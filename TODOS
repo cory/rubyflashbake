@@ -1,0 +1,3 @@
+- make sure git saves on exit
+- move weather uri into initialization
+- move verbosity into initialization

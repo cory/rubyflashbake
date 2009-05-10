@@ -1,0 +1,60 @@
+# default rubyflashbake config file should be .rubyflashbake in the local directory
+# stored in the RubyFlashbake.status instance hash
+# rubyflashbake expects valid yaml
+
+# plugin directories are relative to ./lib/rubyflashbake directory
+# you can add more than one if you want
+:PLUGIN_DIRECTORIES:
+  - plugins
+
+# plugins take the form of
+# :PLUGINBASENAME:
+# - :ACTIVE:                  boolean to turn plugin on and off
+# - optional hash of configuration arguments
+# convetion for plugins:
+#  be name.rb
+#  map to a ALLCAPS(name) section in this file
+#  require a do_name function called every time a file is saved
+#  have an optional configure_name functions called once on configuration file load
+
+# internet alive plugin, confirmed by pinging a test uri
+:PLUGIN:
+  :INTERNET:
+    :ACTIVE:                  true
+    :OPTIONAL_HASH:
+      :INTERNET_ALIVE:        false
+      :INTERNET_TEST_URI:     www.google.com
+
+# location plugin, using maxmind's javascript api
+  :LOCATION:
+    :ACTIVE:                  true
+
+# time plugin, just using native Ruby Time class
+  :TIME:
+    :ACTIVE:                  true
+
+# twitter plugin, using twitter's rest API
+  :TWITTER:
+    :ACTIVE:                  true
+    :OPTIONAL_HASH:
+      :TWITTER_ID:            ~               # your Twitter ID
+
+# weather plugin, using google's undocumented weather API and location plugin
+  :WEATHER:
+    :ACTIVE:                  true
+
+# how often to check directories, in seconds
+:DIRECTORY_MONITOR_INTERVAL:  60
+
+# how many checks to wait for until a file is considered stable
+:STABLE_INTERVALS:            5
+
+# git details, so that you can automate git and github commits in addition to git
+:GIT:
+  :NAME:                      ~               # your name
+  :EMAIL:                     ~               # your email address
+  :USE_GITHUB:                false
+  :GITHUB_DATA:
+    :GITHUB_ID:               ~               # your github ID
+    :GITHUB_REPOSITORY:       ~               # name of the guthub repository to link to
+    :GITHUB_URI:              git@github.com
