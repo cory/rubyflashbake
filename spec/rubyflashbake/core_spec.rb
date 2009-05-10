@@ -24,7 +24,7 @@ describe RubyFlashbake do
       rfb = RubyFlashbake.new
       rfb.load_file("notafile")
     rescue SystemExit => e
-      $stdout.string.should == "Configuration file \"notafile\" not loaded before trying to work with it\nPlease make sure code path loads configuration before trying to load plugins.\n"
+      $stdout.string.should == "Configuration file \"notafile\" not found!\nPlease make sure code path loads configuration before trying to load plugins.\n"
       e.status.should == 1
     end
   end
@@ -47,7 +47,7 @@ describe RubyFlashbake do
   it "should exit if you try to examine git config without loading config file" do
     begin
       rfb = RubyFlashbake.new
-      rfb.check_git_setup("#{File.dirname(__FILE__)}")
+      rfb.configure_git("#{File.dirname(__FILE__)}")
     rescue SystemExit => e
       $stdout.string.should == "Configuration not loaded before trying to work with it\nPlease make sure code path loads configuration before trying to load plugins.\n"
       e.status.should == 1
@@ -58,35 +58,46 @@ describe RubyFlashbake do
     begin
       rfb = RubyFlashbake.new
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
-      rfb.check_git_setup("#{File.dirname(__FILE__)}").should == false
-    rescue SystemExit => e
-      $stdout.string.should == "./spec/rubyflashbake/../../lib/data/.rubyflashbake_example does not have a valid name and email address\nName and email address are needed for the git repository\nPlease fix or use a different configuration file\n"
-      e.status.should == 1
-    end
-  end
-
-  it "if name and email aren't setup and git not configured, dump useful error message and exit" do
-    begin
-      rfb = RubyFlashbake.new
-      rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
-      rfb.configure_git("#{File.dirname(__FILE__)}")
+      rfb.configure_git("#{File.dirname(__FILE__)}").should == false
     rescue SystemExit => e
       $stdout.string.should == "Can't configure git without git :NAME and :EMAIL configured in config file.\n"
       e.status.should == 1
     end
   end
 
-  it "if name and email are setup and git not configured, configure git in watch directory" do
+  it "should configure git in watch directiory if name and email are setup and git not configured" do
     rfb = RubyFlashbake.new
     rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
     rfb.configuration[:GIT][:NAME] = "Test Monkey"
     rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
-    rfb.configure_git("#{File.dirname(__FILE__)}")
+    rfb.configure_git("#{File.dirname(__FILE__)}").should == true
     $stdout.string.scan("Initialized empty Git repository").should_not == []
-    rfb.git_configured_in_directory("#{File.dirname(__FILE__)}").should == true
   end
   
-  it "if uri, github id, and repository aren't setup and git not configured, dump useful error message and exit" do
+  it "should be able to call configure_git multiple times once git is setup" do
+    begin
+      rfb = RubyFlashbake.new
+      rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
+      rfb.configuration[:GIT][:NAME] = "Test Monkey"
+      rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
+      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+    end
+  end
+
+  it "should find .git and .git/config files as signal that git was setup in directory before" do
+    begin
+      rfb = RubyFlashbake.new
+      rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
+      rfb.configuration[:GIT][:NAME] = "Test Monkey"
+      rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
+      Dir.mkdir("#{File.dirname(__FILE__)}/.git")
+      File.open("#{File.dirname(__FILE__)}/.git/config", "w") {|file| file.puts "foo!"}
+      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+    end
+  end
+
+  it "should dump useful error message if uri, github id, and repository aren't setup and git not configured" do
     begin
       rfb = RubyFlashbake.new
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
@@ -100,7 +111,7 @@ describe RubyFlashbake do
     end
   end
 
-  it "if uri, github id, and repository are setup and git not configured, configure github in watch directory" do
+  it "should configure github if uri, github id, and repository are setup and git not configured" do
     begin
       rfb = RubyFlashbake.new
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
@@ -111,8 +122,51 @@ describe RubyFlashbake do
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
       rfb.configure_git("#{File.dirname(__FILE__)}")
+      rfb.configure_github("#{File.dirname(__FILE__)}").should == true
+    end
+  end
+
+  it "should fail if trying to configure github without first configuring git" do
+    begin
+      rfb = RubyFlashbake.new
+      rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
+      rfb.configuration[:GIT][:NAME] = "Test Monkey"
+      rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
+      rfb.configuration[:GIT][:USE_GITHUB] = true
+      rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "fake"
+      rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
+      rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
       rfb.configure_github("#{File.dirname(__FILE__)}")
-      rfb.github_configured_in_directory("#{File.dirname(__FILE__)}").should == true
+    rescue SystemExit => e
+      $stdout.string.should == "Trying to configure github without previous call to config_git.\n"
+    end
+  end
+
+  it "should find .git and .git/config files as signal that git was setup in directory before" do
+    begin
+      rfb = RubyFlashbake.new
+      rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
+      rfb.configuration[:GIT][:NAME] = "Test Monkey"
+      rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
+      Dir.mkdir("#{File.dirname(__FILE__)}/.git")
+      File.open("#{File.dirname(__FILE__)}/.git/config", "w") {|file| file.puts "[remote origin]"}
+      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+    end
+  end
+
+  it "should be fine to repated configure github" do
+    begin
+      rfb = RubyFlashbake.new
+      rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
+      rfb.configuration[:GIT][:NAME] = "Test Monkey"
+      rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
+      rfb.configuration[:GIT][:USE_GITHUB] = true
+      rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "fake"
+      rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
+      rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
+      rfb.configure_git("#{File.dirname(__FILE__)}")
+      rfb.configure_github("#{File.dirname(__FILE__)}").should == true
+      rfb.configure_github("#{File.dirname(__FILE__)}").should == true
     end
   end
 
@@ -196,7 +250,7 @@ describe RubyFlashbake do
     rfb.configure_github("#{File.dirname(__FILE__)}/testdata/testdir/")
     rfb.load_plugins
 
-    rfb.setup_watch_commits("#{File.dirname(__FILE__)}/testdata/testdir", true) 
+    rfb.setup_watch_commits("#{File.dirname(__FILE__)}/testdata/testdir") 
     
     rfb.start_directory_watchers
     File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp.txt", "w") {|file| file.puts "foo!"}

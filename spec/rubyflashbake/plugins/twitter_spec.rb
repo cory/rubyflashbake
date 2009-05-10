@@ -29,7 +29,7 @@ describe RubyFlashbake do
       rfb.configuration[:OUTPUT] = []
       rfb.do_internet
       rfb.do_twitter
-      rfb.configuration[:OUTPUT][0].should == "offline"
+      rfb.configuration[:OUTPUT][0].should == "Couldn't reach twitter"
     end
   end
 end

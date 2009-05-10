@@ -7,6 +7,17 @@
 :PLUGIN_DIRECTORIES:
   - plugins
 
+# when modifying git repository, spam STDOUT 
+:VERBOSE:                     true
+
+# what order should we run plugins in?
+:PLUGIN_CALL_ORDER:
+  - :TIME
+  - :INTERNET
+  - :LOCATION
+  - :WEATHER
+  - :TWITTER
+
 # plugins take the form of
 # :PLUGINBASENAME:
 # - :ACTIVE:                  boolean to turn plugin on and off
@@ -42,6 +53,8 @@
 # weather plugin, using google's undocumented weather API and location plugin
   :WEATHER:
     :ACTIVE:                  true
+    :OPTIONAL_HASH:
+      :WEATHER_URI:           http://www.google.com/ig/api?weather=     # uri to get weather from
 
 # how often to check directories, in seconds
 :DIRECTORY_MONITOR_INTERVAL:  60
