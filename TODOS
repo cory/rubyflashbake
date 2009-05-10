@@ -1,1 +1,2 @@
 - move rubyflashbake.rb functionality into core.rb and add test
+- make into gem
