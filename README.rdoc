@@ -1,0 +1,7 @@
+= rubyflashbake
+
+A Ruby project inspired by Thomas Gideon's python Flashbake project.
+
+== Copyright
+
+Copyright (c) 2009 Cory Ondrejka. See LICENSE for details.
