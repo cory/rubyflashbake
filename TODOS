@@ -1,2 +1,3 @@
 - move rubyflashbake.rb functionality into core.rb and add test
-- make into gem
+- pull gem version into bin -v
+- buff out rdoc
