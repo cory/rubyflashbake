@@ -10,7 +10,6 @@ begin
     gem.email = "cory.ondrejka@gmail.com"
     gem.homepage = "http://github.com/cory/rubyflashbake"
     gem.authors = ["Cory Ondrejka"]
-    gem.version = "0.1.2" 
     gem.homepage = "http://cory.github.com" 
     gem.platform = Gem::Platform::RUBY 
     gem.required_ruby_version = '>=1.8' 

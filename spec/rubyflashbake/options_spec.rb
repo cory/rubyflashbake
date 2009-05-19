@@ -10,6 +10,7 @@ RubyFlashbakeOptionHelp = <<-EOF
 Usage: rubyflashbake [ options ]
     -c, --config [file]              Use config file [file]
     -e, --example                    Dump an example, annotated config file to stdout and exit
+    -v, --version                    Dump version number
     -h, --help                       You're looking at it.  Functionality documented in config file and on first run.
 EOF
 
@@ -41,6 +42,24 @@ describe RubyFlashbakeOptions do
 
   it "should read from config file if --config foo option given" do
     RubyFlashbakeOptions.new(["--config", "foo"]).test([:config_file => "foo"]).should == true
+  end
+
+  it "should dump version and exit if -v option given" do
+    begin
+      RubyFlashbakeOptions.new(["-v"])
+    rescue SystemExit => e
+      $stdout.string.scan(/\d+\.\d+\.\d+/).should_not == []
+      e.status.should == 0
+    end
+  end
+
+  it "should dump version and exit if -v option given" do
+    begin
+      RubyFlashbakeOptions.new(["--version"])
+    rescue SystemExit => e
+      $stdout.string.scan(/\d+\.\d+\.\d+/).should_not == []
+      e.status.should == 0
+    end
   end
 
   it "should print out help when -h is requested or not input" do

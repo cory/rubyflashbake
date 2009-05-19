@@ -33,11 +33,17 @@ class RubyFlashbakeOptions
         exit
       end
             
+      opts.on("-v", "--version", "Dump version number") do
+        yml = YAML.load(File.read(File.join(File.dirname(__FILE__), *%w[.. .. VERSION.yml])))
+        puts "rubyflashbake #{yml[:major]}.#{yml[:minor]}.#{yml[:patch]}"
+        exit
+      end
+
       opts.on("-h", "--help", "You're looking at it.  Functionality documented in config file and on first run.") do
         puts opts
         exit
       end
-
+      
       begin
         opts.parse!(argv)
       rescue OptionParser::ParseError => e
