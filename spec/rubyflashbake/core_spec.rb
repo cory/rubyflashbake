@@ -7,18 +7,19 @@ require "#{File.dirname(__FILE__)}/../../lib/rubyflashbake/core"
 
 describe RubyFlashbake do
   before :all do
-    @testdirectory = "#{File.dirname(__FILE__)}/testdata/testdir"
+    @testdirectory = "#{File.dirname(__FILE__)}/../../../rubyflashbake_testing"
   end
   
   before :each do
     @stdout_orig = $stdout 
     $stdout = StringIO.new 
-    FileUtils.rm_rf("#{@testdirectory}/.git")
+    FileUtils.rm_rf("#{@testdirectory}")
+    FileUtils.mkdir("#{@testdirectory}")
   end
   
   after :each do
     $stdout = @stdout_orig
-    FileUtils.rm_rf("#{@testdirectory}/.git")
+    FileUtils.rm_rf("#{@testdirectory}")
   end
 
   it "should print error message and exit if config file isn't found" do
@@ -108,7 +109,7 @@ describe RubyFlashbake do
       rfb.configure_git("#{@testdirectory}")
       rfb.configure_github("#{@testdirectory}")
     rescue SystemExit => e
-      $stdout.string.should == "Initialized git in ./spec/rubyflashbake/testdata/testdir\nCan't configure github without :GITHUB_URI, :GITHUB_ID, and :GITHUB_REPOSITORY configured in config file.\n"
+      $stdout.string.should == "Initialized git in ./spec/rubyflashbake/../../../rubyflashbake_testing\nCan't configure github without :GITHUB_URI, :GITHUB_ID, and :GITHUB_REPOSITORY configured in config file.\n"
       e.status.should == 1
     end
   end
