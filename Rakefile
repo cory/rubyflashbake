@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rake'
+require 'spec/rake/spectask'
 
 begin
   require 'jeweler'
@@ -22,29 +23,6 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end
 
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/*_test.rb'
-  test.verbose = true
-end
-
-begin
-  require 'rcov/rcovtask'
-  Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.pattern = 'test/**/*_test.rb'
-    test.verbose = true
-  end
-rescue LoadError
-  task :rcov do
-    abort "RCov is not available. In order to run rcov, you must: sudo gem install spicycode-rcov"
-  end
-end
-
-
-task :default => :test
-
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   if File.exist?('VERSION.yml')
@@ -60,10 +38,10 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
-
 desc "Run all specs"
+dir = File.dirname(__FILE__)
 Spec::Rake::SpecTask.new('specs') do |t|
-  t.spec_files = FileList['spec/**/*.rb']
+  t.spec_files = FileList['spec/**/*_spec.rb']
   unless ENV['NO_RCOV']
     t.rcov = true
     t.rcov_dir = 'coverage'

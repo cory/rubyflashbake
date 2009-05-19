@@ -46,11 +46,11 @@ class RubyFlashbake
       else
         if (@configuration[:GIT][:NAME] && @configuration[:GIT][:EMAIL])
           Dir.chdir("#{dir}") do
-            puts `git init`
-            puts `git config user.name "#{@configuration[:GIT][:NAME]}"`
-            puts `git config user.email #{@configuration[:GIT][:EMAIL]}`
+            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} init")
+            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} config user.name \"#{@configuration[:GIT][:NAME]}\"")
+            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} config user.email \"#{@configuration[:GIT][:EMAIL]}\"")
             File.open(".gitignore", "w")  do |file| 
-              file.puts ".DS_Store\ncoverage/\n.message.tmp\n"
+              file.puts ".DS_Store\n.message.tmp\n"
             end
             puts "Initialized git in #{dir}"
             @configuration[:GIT_SETUP] = true
@@ -71,13 +71,15 @@ class RubyFlashbake
       exit 1
     end
     unless @configuration[:GITHUB_SETUP] == true
-      contents = File.read("#{dir}/.git/config")
+      if File.exists?("#{dir}/.git/config")
+        contents = File.read("#{dir}/.git/config")
+      end
       if contents =~ /\[remote \"origin\"\]/
         @configuration[:GITHUB_SETUP] = true
       else
         Dir.chdir("#{dir}") do
           if !@configuration[:GITHUB_SETUP] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]
-            puts `git remote add origin #{configuration[:GIT][:GITHUB_DATA][:GITHUB_URI]}:#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_ID]}/#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]}.git`
+            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} remote add origin #{configuration[:GIT][:GITHUB_DATA][:GITHUB_URI]}:#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_ID]}/#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]}.git")
             puts "Initialized github in #{dir}"
             @configuration[:GITHUB_SETUP] = true
           else
@@ -88,7 +90,7 @@ class RubyFlashbake
       end
     end
     Dir.chdir("#{dir}") do
-      puts `git pull origin master`
+      system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} pull origin master")
     end
     return true
   end
@@ -97,11 +99,11 @@ class RubyFlashbake
     if @configuration[:GIT_SETUP] == true
       Dir.chdir("#{dir}") do
         File.open(".message.tmp", "w") {|file| file.puts message}
-        puts `git add .`
-        puts `git commit -a --file=.message.tmp`
+        system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} add .")
+        system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} commit -a --file=.message.tmp")
         File.delete(".message.tmp")
         if @configuration[:INTERNET_ALIVE] && @configuration[:GIT][:USE_GITHUB] && @configuration[:GITHUB_SETUP]
-          puts `git push origin master`
+          system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} push origin master")
         end
       end
     end

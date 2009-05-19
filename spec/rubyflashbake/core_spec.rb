@@ -6,17 +6,19 @@
 require "#{File.dirname(__FILE__)}/../../lib/rubyflashbake/core"
 
 describe RubyFlashbake do
+  before :all do
+    @testdirectory = "#{File.dirname(__FILE__)}/testdata/testdir"
+  end
+  
   before :each do
     @stdout_orig = $stdout 
     $stdout = StringIO.new 
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/.git")
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/testdata/testdir/.git")
+    FileUtils.rm_rf("#{@testdirectory}/.git")
   end
   
   after :each do
     $stdout = @stdout_orig
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/.git")
-    FileUtils.rm_rf("#{File.dirname(__FILE__)}/testdata/testdir/.git")
+    FileUtils.rm_rf("#{@testdirectory}/.git")
   end
 
   it "should print error message and exit if config file isn't found" do
@@ -47,7 +49,7 @@ describe RubyFlashbake do
   it "should exit if you try to examine git config without loading config file" do
     begin
       rfb = RubyFlashbake.new
-      rfb.configure_git("#{File.dirname(__FILE__)}")
+      rfb.configure_git("#{@testdirectory}")
     rescue SystemExit => e
       $stdout.string.should == "Configuration not loaded before trying to work with it\nPlease make sure code path loads configuration before trying to load plugins.\n"
       e.status.should == 1
@@ -58,7 +60,7 @@ describe RubyFlashbake do
     begin
       rfb = RubyFlashbake.new
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
-      rfb.configure_git("#{File.dirname(__FILE__)}").should == false
+      rfb.configure_git("#{@testdirectory}").should == false
     rescue SystemExit => e
       $stdout.string.should == "Can't configure git without git :NAME and :EMAIL configured in config file.\n"
       e.status.should == 1
@@ -70,8 +72,8 @@ describe RubyFlashbake do
     rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
     rfb.configuration[:GIT][:NAME] = "Test Monkey"
     rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
-    rfb.configure_git("#{File.dirname(__FILE__)}").should == true
-    $stdout.string.scan("Initialized empty Git repository").should_not == []
+    rfb.configure_git("#{@testdirectory}").should == true
+    $stdout.string.scan("Initialized git").should_not == []
   end
   
   it "should be able to call configure_git multiple times once git is setup" do
@@ -80,8 +82,8 @@ describe RubyFlashbake do
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
       rfb.configuration[:GIT][:NAME] = "Test Monkey"
       rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
-      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
-      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+      rfb.configure_git("#{@testdirectory}").should == true
+      rfb.configure_git("#{@testdirectory}").should == true
     end
   end
 
@@ -91,9 +93,9 @@ describe RubyFlashbake do
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
       rfb.configuration[:GIT][:NAME] = "Test Monkey"
       rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
-      Dir.mkdir("#{File.dirname(__FILE__)}/.git")
-      File.open("#{File.dirname(__FILE__)}/.git/config", "w") {|file| file.puts "foo!"}
-      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+      Dir.mkdir("#{@testdirectory}/.git")
+      File.open("#{@testdirectory}/.git/config", "w") {|file| file.puts "foo!"}
+      rfb.configure_git("#{@testdirectory}").should == true
     end
   end
 
@@ -103,10 +105,10 @@ describe RubyFlashbake do
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
       rfb.configuration[:GIT][:NAME] = "Test Monkey"
       rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
-      rfb.configure_git("#{File.dirname(__FILE__)}")
-      rfb.configure_github("#{File.dirname(__FILE__)}")
+      rfb.configure_git("#{@testdirectory}")
+      rfb.configure_github("#{@testdirectory}")
     rescue SystemExit => e
-      $stdout.string.should == "Initialized empty Git repository in /Users/cory/opensource/rubyflashbake/spec/rubyflashbake/.git/\n\n\nInitialized git in ./spec/rubyflashbake\nCan't configure github without :GITHUB_URI, :GITHUB_ID, and :GITHUB_REPOSITORY configured in config file.\n"
+      $stdout.string.should == "Initialized git in ./spec/rubyflashbake/testdata/testdir\nCan't configure github without :GITHUB_URI, :GITHUB_ID, and :GITHUB_REPOSITORY configured in config file.\n"
       e.status.should == 1
     end
   end
@@ -121,8 +123,8 @@ describe RubyFlashbake do
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
-      rfb.configure_git("#{File.dirname(__FILE__)}")
-      rfb.configure_github("#{File.dirname(__FILE__)}").should == true
+      rfb.configure_git("#{@testdirectory}")
+      rfb.configure_github("#{@testdirectory}").should == true
     end
   end
 
@@ -136,7 +138,7 @@ describe RubyFlashbake do
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
-      rfb.configure_github("#{File.dirname(__FILE__)}")
+      rfb.configure_github("#{@testdirectory}")
     rescue SystemExit => e
       $stdout.string.should == "Trying to configure github without previous call to config_git.\n"
     end
@@ -148,9 +150,9 @@ describe RubyFlashbake do
       rfb.load_file("#{File.dirname(__FILE__)}/../../lib/data/.rubyflashbake_example")
       rfb.configuration[:GIT][:NAME] = "Test Monkey"
       rfb.configuration[:GIT][:EMAIL] = "mokey@fake.fake"
-      Dir.mkdir("#{File.dirname(__FILE__)}/.git")
-      File.open("#{File.dirname(__FILE__)}/.git/config", "w") {|file| file.puts "[remote origin]"}
-      rfb.configure_git("#{File.dirname(__FILE__)}").should == true
+      Dir.mkdir("#{@testdirectory}/.git")
+      File.open("#{@testdirectory}/.git/config", "w") {|file| file.puts "[remote origin]"}
+      rfb.configure_git("#{@testdirectory}").should == true
     end
   end
 
@@ -164,9 +166,9 @@ describe RubyFlashbake do
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY] = "fake"
       rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
-      rfb.configure_git("#{File.dirname(__FILE__)}")
-      rfb.configure_github("#{File.dirname(__FILE__)}").should == true
-      rfb.configure_github("#{File.dirname(__FILE__)}").should == true
+      rfb.configure_git("#{@testdirectory}")
+      rfb.configure_github("#{@testdirectory}").should == true
+      rfb.configure_github("#{@testdirectory}").should == true
     end
   end
 
@@ -208,11 +210,11 @@ describe RubyFlashbake do
     rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
     rfb.configuration[:DIRECTORY_MONITOR_INTERVAL] = 1
     rfb.configuration[:STABLE_INTERVALS] = 1
-    rfb.configure_git("#{File.dirname(__FILE__)}/testdata/testdir/")
-    rfb.configure_github("#{File.dirname(__FILE__)}/testdata/testdir/")
+    rfb.configure_git("#{@testdirectory}")
+    rfb.configure_github("#{@testdirectory}")
     rfb.load_plugins
     output = ""
-    rfb.setup_directory_watchers("#{File.dirname(__FILE__)}/testdata/testdir/") do |events, basedir, func|
+    rfb.setup_directory_watchers("#{@testdirectory}") do |events, basedir, func|
       events.each do |event|
         if event.type == :stable
           output += "#{basedir} #{event}\n#{func}"
@@ -220,13 +222,13 @@ describe RubyFlashbake do
       end
     end
     rfb.start_directory_watchers
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp.txt", "w") {|file| file.puts "foo!"}
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp2.txt", "w") {|file| file.puts "foo!"}
+    File.open("#{@testdirectory}/temp.txt", "w") {|file| file.puts "foo!"}
+    File.open("#{@testdirectory}/temp2.txt", "w") {|file| file.puts "foo!"}
     sleep(10)
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp3.txt", "w") {|file| file.puts "foo!"}
-    File.delete("#{File.dirname(__FILE__)}/testdata/testdir/temp3.txt")
-    File.delete("#{File.dirname(__FILE__)}/testdata/testdir/temp2.txt")
-    File.delete("#{File.dirname(__FILE__)}/testdata/testdir/temp.txt")
+    File.open("#{@testdirectory}/temp3.txt", "w") {|file| file.puts "foo!"}
+    File.delete("#{@testdirectory}/temp3.txt")
+    File.delete("#{@testdirectory}/temp2.txt")
+    File.delete("#{@testdirectory}/temp.txt")
     
     output.scan(/temp\.txt/).should_not == []
     output.scan(/temp2\.txt/).should_not == [] 
@@ -246,19 +248,19 @@ describe RubyFlashbake do
     rfb.configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] = "git@github.com"
     rfb.configuration[:DIRECTORY_MONITOR_INTERVAL] = 1
     rfb.configuration[:STABLE_INTERVALS] = 1
-    rfb.configure_git("#{File.dirname(__FILE__)}/testdata/testdir/")
-    rfb.configure_github("#{File.dirname(__FILE__)}/testdata/testdir/")
+    rfb.configure_git("#{@testdirectory}")
+    rfb.configure_github("#{@testdirectory}")
     rfb.load_plugins
 
-    rfb.setup_watch_commits("#{File.dirname(__FILE__)}/testdata/testdir") 
+    rfb.setup_watch_commits("#{@testdirectory}") 
     
     rfb.start_directory_watchers
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp.txt", "w") {|file| file.puts "foo!"}
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp2.txt", "w") {|file| file.puts "foo!"}
+    File.open("#{@testdirectory}/temp.txt", "w") {|file| file.puts "foo!"}
+    File.open("#{@testdirectory}/temp2.txt", "w") {|file| file.puts "foo!"}
     sleep(10)
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp3.txt", "w") {|file| file.puts "foo!"}
-    File.open("#{File.dirname(__FILE__)}/testdata/testdir/temp3.txt", "a") {|file| file.puts "bar!"}
-    File.delete("#{File.dirname(__FILE__)}/testdata/testdir/temp2.txt")
+    File.open("#{@testdirectory}/temp3.txt", "w") {|file| file.puts "foo!"}
+    File.open("#{@testdirectory}/temp3.txt", "a") {|file| file.puts "bar!"}
+    File.delete("#{@testdirectory}/temp2.txt")
     sleep(10)
     
     rfb.stop_directory_watchers
@@ -266,13 +268,13 @@ describe RubyFlashbake do
     status = ""
     log = ""
     
-    Dir.chdir("#{File.dirname(__FILE__)}/testdata/testdir/") do
+    Dir.chdir("#{@testdirectory}") do
       status = `git status`
       log = `git log`
     end
     
-    File.delete("#{File.dirname(__FILE__)}/testdata/testdir/temp3.txt")
-    File.delete("#{File.dirname(__FILE__)}/testdata/testdir/temp.txt")
+    File.delete("#{@testdirectory}/temp3.txt")
+    File.delete("#{@testdirectory}/temp.txt")
     
     status.should == "# On branch master\nnothing to commit (working directory clean)\n"
     log.scan(/commit/).length.should == 2
