@@ -11,7 +11,7 @@ Usage: rubyflashbake [ options ]
     -c, --config [file]              Use config file [file]
     -e, --example                    Dump an example, annotated config file to stdout and exit
     -v, --version                    Dump version number
-    -h, --help                       You're looking at it.  Functionality documented in config file and on first run.
+    -h, --help                       You're looking at it.  Use --example to dump the config file.
 EOF
 
 describe RubyFlashbakeOptions do

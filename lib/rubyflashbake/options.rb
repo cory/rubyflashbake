@@ -39,7 +39,7 @@ class RubyFlashbakeOptions
         exit
       end
 
-      opts.on("-h", "--help", "You're looking at it.  Functionality documented in config file and on first run.") do
+      opts.on("-h", "--help", "You're looking at it.  Use --example to dump the config file.") do
         puts opts
         exit
       end

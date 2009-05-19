@@ -1,12 +1,7 @@
-yml = YAML.load(File.read(File.join(File.dirname(__FILE__), *%w[.. .. VERSION.yml])))
-  puts "rubyflashbake #{yml[:major]}.#{yml[:minor]}.#{yml[:patch]}"
-end
-
 spec = Gem::Specification.new do |s| 
   s.name = "rubyflashbake" 
   s.summary = "A Ruby project inspired by Thomas Gideon’s python Flashbake project" 
-  yml = YAML.load(File.read(File.join(File.dirname(__FILE__), *%w[VERSION.yml])))
-  s.version = "#{yml[:major]}.#{yml[:minor]}.#{yml[:patch]}"
+  s.version = "0.1.5"
   s.author = "Cory Ondrejka" 
   s.email = "cory.ondrejka@gmail.com" 
   s.homepage = "http://cory.github.com" 
