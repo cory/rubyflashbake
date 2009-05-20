@@ -1,2 +1,3 @@
-- move rubyflashbake.rb functionality into core.rb and add test
+- move rubyflashbake.rb functionality into core.rb and add testing
 - buff out rdoc
+- refactor location testing to allow for 100% code coverage

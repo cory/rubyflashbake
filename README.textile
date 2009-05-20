@@ -12,6 +12,10 @@ I thought that Flashbake was a very cool project, but since I spend time in the 
 
 As always, it's all about writing snippets of fun code.
 
+h2. Use
+
+Run "rubyflashbake --example" in the directory you want to watch to dump the configuration file.  Fill in as needed and then launch rubyflashbake and enjoy automatic git and github commits with lots of fun location and web aware commit comments.  Bask in joy.
+
 h2. License
 
 Copyright (c) 2009 Cory Ondrejka
