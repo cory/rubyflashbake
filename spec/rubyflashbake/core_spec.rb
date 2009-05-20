@@ -8,6 +8,9 @@ require "#{File.dirname(__FILE__)}/../../lib/rubyflashbake/core"
 describe RubyFlashbake do
   before :all do
     @testdirectory = "#{File.dirname(__FILE__)}/../../../rubyflashbake_testing"
+    ENV["GIT_DIR"] = nil
+    ENV["GIT_WORK_TREE"] = nil
+    ENV["GIT_INDEX_FILE"] = nil
   end
   
   before :each do
@@ -270,9 +273,9 @@ describe RubyFlashbake do
     log = ""
     
     status = `git --git-dir=#{@testdirectory}/.git --work-tree=#{@testdirectory} status`
-    $stderr.puts status
+    $stderr.puts "status: #{status}"
     log = `git --git-dir=#{@testdirectory}/.git --work-tree=#{@testdirectory} log`
-    $stderr.puts log
+    $stderr.puts "log: #{log}"
     
     status.scan(/nothing to commit/).should_not == []
     log.scan(/commit/).length.should == 2
