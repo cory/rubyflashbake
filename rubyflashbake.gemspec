@@ -29,7 +29,6 @@ spec = Gem::Specification.new do |s|
     "spec/rubyflashbake/plugins/time_spec.rb",
     "spec/rubyflashbake/plugins/twitter_spec.rb",
     "spec/rubyflashbake/plugins/weather_spec.rb",
-    "spec/rubyflashbake/testdata/testdir/.gitignore",
     ]
   s.default_executable = %q{rubyflashbake}
   s.executables = [ 'rubyflashbake' ] 
