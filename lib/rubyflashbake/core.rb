@@ -45,16 +45,14 @@ class RubyFlashbake
         @configuration[:GIT_SETUP] = true
       else
         if (@configuration[:GIT][:NAME] && @configuration[:GIT][:EMAIL])
-          Dir.chdir("#{dir}") do
-            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} init")
-            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} config user.name \"#{@configuration[:GIT][:NAME]}\"")
-            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} config user.email \"#{@configuration[:GIT][:EMAIL]}\"")
-            File.open(".gitignore", "w")  do |file| 
-              file.puts ".DS_Store\n.message.tmp\n"
-            end
-            puts "Initialized git in #{dir}"
-            @configuration[:GIT_SETUP] = true
+          system("git --git-dir=#{dir}/.git --work-tree=#{dir} init")
+          system("git --git-dir=#{dir}/.git --work-tree=#{dir} config user.name \"#{@configuration[:GIT][:NAME]}\"")
+          system("git --git-dir=#{dir}/.git --work-tree=#{dir} config user.email \"#{@configuration[:GIT][:EMAIL]}\"")
+          File.open("#{dir}/.gitignore", "w")  do |file| 
+            file.puts ".DS_Store\n.message.tmp\n"
           end
+          puts "Initialized git in #{dir}"
+          @configuration[:GIT_SETUP] = true
         else
           puts "Can't configure git without git :NAME and :EMAIL configured in config file."
           exit 1
@@ -77,34 +75,28 @@ class RubyFlashbake
       if contents =~ /\[remote \"origin\"\]/
         @configuration[:GITHUB_SETUP] = true
       else
-        Dir.chdir("#{dir}") do
-          if !@configuration[:GITHUB_SETUP] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]
-            system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} remote add origin #{configuration[:GIT][:GITHUB_DATA][:GITHUB_URI]}:#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_ID]}/#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]}.git")
-            puts "Initialized github in #{dir}"
-            @configuration[:GITHUB_SETUP] = true
-          else
-            puts "Can't configure github without :GITHUB_URI, :GITHUB_ID, and :GITHUB_REPOSITORY configured in config file."
-            exit 1
-          end
+        if !@configuration[:GITHUB_SETUP] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_URI] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_ID] && @configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]
+          system("git --git-dir=#{dir}/.git --work-tree=#{dir} remote add origin #{configuration[:GIT][:GITHUB_DATA][:GITHUB_URI]}:#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_ID]}/#{@configuration[:GIT][:GITHUB_DATA][:GITHUB_REPOSITORY]}.git")
+          puts "Initialized github in #{dir}"
+          @configuration[:GITHUB_SETUP] = true
+        else
+          puts "Can't configure github without :GITHUB_URI, :GITHUB_ID, and :GITHUB_REPOSITORY configured in config file."
+          exit 1
         end
       end
     end
-    Dir.chdir("#{dir}") do
-      system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} pull origin master")
-    end
+    system("git --git-dir=#{dir}/.git --work-tree=#{dir} pull origin master")
     return true
   end
 
   def git_commit(dir, message)
     if @configuration[:GIT_SETUP] == true
-      Dir.chdir("#{dir}") do
-        File.open(".message.tmp", "w") {|file| file.puts message}
-        system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} add .")
-        system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} commit -a --file=.message.tmp")
-        File.delete(".message.tmp")
-        if @configuration[:INTERNET_ALIVE] && @configuration[:GIT][:USE_GITHUB] && @configuration[:GITHUB_SETUP]
-          system("git --git-dir=#{Dir.pwd}/.git --work-tree=#{Dir.pwd} push origin master")
-        end
+      File.open("#{dir}/.message.tmp", "w") {|file| file.puts message}
+      system("git --git-dir=#{dir}/.git --work-tree=#{dir} add .")
+      system("git --git-dir=#{dir}/.git --work-tree=#{dir} commit -a --file=.message.tmp")
+      File.delete("#{dir}/.message.tmp")
+      if @configuration[:INTERNET_ALIVE] && @configuration[:GIT][:USE_GITHUB] && @configuration[:GITHUB_SETUP]
+        system("git --git-dir=#{dir}/.git --work-tree=#{dir} push origin master")
       end
     end
   end

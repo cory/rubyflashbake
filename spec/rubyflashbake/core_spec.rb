@@ -269,15 +269,12 @@ describe RubyFlashbake do
     status = ""
     log = ""
     
-    Dir.chdir("#{@testdirectory}") do
-      status = `git status`
-      log = `git log`
-    end
+    status = `git --git-dir=#{@testdirectory}/.git --work-tree=#{@testdirectory} status`
+    $stderr.puts status
+    log = `git --git-dir=#{@testdirectory}/.git --work-tree=#{@testdirectory} log`
+    $stderr.puts log
     
-    File.delete("#{@testdirectory}/temp3.txt")
-    File.delete("#{@testdirectory}/temp.txt")
-    
-    status.should == "# On branch master\nnothing to commit (working directory clean)\n"
+    status.scan(/nothing to commit/).should_not == []
     log.scan(/commit/).length.should == 2
   end
 end
