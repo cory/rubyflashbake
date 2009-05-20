@@ -1,7 +1,7 @@
 spec = Gem::Specification.new do |s| 
   s.name = "rubyflashbake" 
   s.summary = "A Ruby project inspired by Thomas Gideon’s python Flashbake project" 
-  s.version = "0.1.6"
+  s.version = "0.1.7"
   s.author = "Cory Ondrejka" 
   s.email = "cory.ondrejka@gmail.com" 
   s.homepage = "http://cory.github.com" 
