@@ -4,7 +4,7 @@ A Ruby project inspired by Thomas Gideon's python "Flashbake":http://wiki.github
 
 h2. What it is
 
-A set of routines to help with writing and blogging.
+Automatically checks in files from watched directories to git and github with time, location, weather, and recent twitter comments in the commit comments.
 
 h2. "But, why?" you ask
 

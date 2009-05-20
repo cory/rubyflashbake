@@ -4,7 +4,7 @@ A Ruby project inspired by Thomas Gideon's python "Flashbake":http://wiki.github
 
 == What it is
 
-A set of routines to help with writing and blogging.
+Automatically checks in files from watched directories to git and github with time, location, weather, and recent twitter comments in the commit comments.
 
 == "But, why?" you ask
 
