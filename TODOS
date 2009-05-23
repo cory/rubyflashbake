@@ -1,2 +1,3 @@
 - move rubyflashbake.rb functionality into core.rb and add testing
 - refactor location testing to allow for 100% code coverage
+- change over to ruby-git and grit rather than command line
